@@ -1,0 +1,86 @@
+diff --git a/server.js b/server.js
+index 2d991fb..0582139 100644
+--- a/server.js
++++ b/server.js
+@@ -125,7 +125,7 @@ export async function createApp({
+   provider = createProvider(),
+   configStore = createConfigStore(),
+   pin = newPin(),
+-  sessions = createSessionStore(),
++  sessions = createSessionStore({ file: configStore?.path ? `${configStore.path}.sessions` : "" }),
+   lockout = createLockout(),
+   allowDestructive = true,
+   trustLoopback = true,
+diff --git a/src/auth.js b/src/auth.js
+index 878d2b4..d29eb29 100644
+--- a/src/auth.js
++++ b/src/auth.js
+@@ -15,7 +15,9 @@
+  */
+ 
+ import { randomBytes, randomInt, timingSafeEqual } from "node:crypto";
++import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
+ import { isIP } from "node:net";
++import { dirname } from "node:path";
+ import { hostname as osHostname } from "node:os";
+ 
+ export const PIN_LENGTH = 6;
+@@ -173,19 +175,49 @@ export function createLockout({
+ }
+ 
+ /** Opaque session tokens with an expiry. */
+-export function createSessionStore({ ttlMs = SESSION_TTL_MS, now = Date.now } = {}) {
++export function createSessionStore({ ttlMs = SESSION_TTL_MS, now = Date.now, file = "" } = {}) {
+   const sessions = new Map();
+ 
+   function prune(at) {
+     for (const [token, expiry] of sessions) if (expiry <= at) sessions.delete(token);
+   }
+ 
++  // Optional persistence. Without it a host restart signs every phone out and
++  // the user has to pair again with a fresh PIN.
++  function load() {
++    if (!file) return;
++    try {
++      const saved = JSON.parse(readFileSync(file, "utf8"));
++      const at = now();
++      for (const [token, expiry] of Object.entries(saved)) {
++        if (typeof token === "string" && Number.isFinite(expiry) && expiry > at) sessions.set(token, expiry);
++      }
++    } catch {
++      // No file yet, or unreadable: start with no sessions.
++    }
++  }
++
++  function save() {
++    if (!file) return;
++    try {
++      mkdirSync(dirname(file), { recursive: true });
++      const temporary = `${file}.${process.pid}.tmp`;
++      writeFileSync(temporary, JSON.stringify(Object.fromEntries(sessions)), { mode: 0o600 });
++      renameSync(temporary, file);
++    } catch {
++      // A read-only config directory still works, just without persistence.
++    }
++  }
++
++  load();
++
+   return {
+     issue() {
+       const at = now();
+       prune(at);
+       const token = randomBytes(32).toString("base64url");
+       sessions.set(token, at + ttlMs);
++      save();
+       return token;
+     },
+     verify(token) {
+@@ -200,6 +232,7 @@ export function createSessionStore({ ttlMs = SESSION_TTL_MS, now = Date.now } =
+     },
+     revokeAll() {
+       sessions.clear();
++      save();
+     },
+     get size() {
+       prune(now());

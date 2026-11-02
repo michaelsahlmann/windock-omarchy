@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "michael.windock",
+  "name": "WinDock",
+  "version": "1.0.0",
+  "author": "Michael",
+  "description": "Estado de WinDock, dirección IP y control de encendido/apagado desde la barra",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "WinDock",
+    "description": "Estado de WinDock, dirección IP y control de encendido/apagado desde la barra",
+    "category": "System",
+    "allowMultiple": false
+  }
+}
