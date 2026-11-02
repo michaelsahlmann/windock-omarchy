@@ -1,3 +1,7 @@
+# Patch for WinDock (https://github.com/aliihsaad/WinDock)
+# WinDock is MIT licensed, copyright (c) 2026 Ali Saad.
+# See licenses/WinDock-LICENSE in this repository.
+#
 diff --git a/server.js b/server.js
 index 2d991fb..0582139 100644
 --- a/server.js

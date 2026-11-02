@@ -95,4 +95,4 @@ An end-to-end run against the patched server confirmed the point of the patch: p
 
 MIT. See [LICENSE](LICENSE).
 
-WinDock itself is MIT, copyright © 2026 Ali Saad.
+WinDock itself is MIT, copyright © 2026 Ali Saad. Because the patch modifies its source, the full WinDock license is reproduced in [licenses/WinDock-LICENSE](licenses/WinDock-LICENSE). See [NOTICE](NOTICE) for what comes from where.

@@ -1,0 +1,16 @@
+This repository contains work derived from WinDock.
+
+WinDock
+  https://github.com/aliihsaad/WinDock
+  MIT License, copyright (c) 2026 Ali Saad.
+  Full text: licenses/WinDock-LICENSE
+
+persistent-sessions.patch modifies WinDock's src/auth.js and server.js, so it
+includes portions of that source. The WinDock license is reproduced in full
+because the MIT terms require the notice to travel with substantial portions
+of the software.
+
+The bar widget in omarchy-widget/ is original work written against Omarchy's
+plugin API. Omarchy (https://github.com/omacom/omarchy) is MIT licensed.
+
+No code from Weylus (AGPL-3.0) or KDE Connect (GPL-2.0) is included.
